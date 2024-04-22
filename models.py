@@ -161,6 +161,10 @@ class DigitClassificationModel(object):
     def __init__(self):
         # Initialize your model parameters here
         "*** YOUR CODE HERE ***"
+        self.W1 = nn.Parameter(784, 256)
+        self.b1 = nn.Parameter(1, 256)
+        self.W2 = nn.Parameter(256, 10)
+        self.b2 = nn.Parameter(1, 10)
 
     def run(self, x):
         """
@@ -177,6 +181,13 @@ class DigitClassificationModel(object):
                 (also called logits)
         """
         "*** YOUR CODE HERE ***"
+        # Forward pass
+        x = nn.Linear(x, self.W1)
+        x = nn.AddBias(x, self.b1)
+        x = nn.ReLU(x)
+        x = nn.Linear(x, self.W2)
+        x = nn.AddBias(x, self.b2)
+        return x
 
     def get_loss(self, x, y):
         """
@@ -192,12 +203,37 @@ class DigitClassificationModel(object):
         Returns: a loss node
         """
         "*** YOUR CODE HERE ***"
+        
+        scores = self.run(x)
+        return nn.SoftmaxLoss(scores, y)
 
     def train(self, dataset):
         """
         Trains the model.
         """
         "*** YOUR CODE HERE ***"
+        learning_rate = 0.1
+        num_epochs = 20
+        batch_size = 60 
+
+        for epoch in range(num_epochs):
+            total_loss = 0.0
+            for x_batch, y_batch in dataset.iterate_once(batch_size):
+                # Forward pass
+                loss = self.get_loss(x_batch, y_batch)
+                total_loss += nn.as_scalar(loss)
+                # Backward pass
+                grads = nn.gradients(loss, [self.W1, self.b1, self.W2, self.b2])
+                # Update parameters
+                self.W1.update(grads[0], -learning_rate)
+                self.b1.update(grads[1], -learning_rate)
+                self.W2.update(grads[2], -learning_rate)
+                self.b2.update(grads[3], -learning_rate)
+            val_accuracy = dataset.get_validation_accuracy()
+            print("Epoch {}, Avg. Loss: {:.4f}, Validation Accuracy: {:.2f}%".format(epoch+1, total_loss, val_accuracy * 100))
+            #  higher stopping threshold
+            if val_accuracy >= 0.975:
+                break
 
 class LanguageIDModel(object):
     """
