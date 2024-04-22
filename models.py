@@ -73,7 +73,11 @@ class RegressionModel(object):
     def __init__(self):
         # Initialize your model parameters here
         "*** YOUR CODE HERE ***"
-
+        self.W1 = nn.Parameter(1, 64)  # Parameters for the first layer
+        self.b1 = nn.Parameter(1, 64)  # Bias for the first layer
+        self.W2 = nn.Parameter(64, 1)  # Parameters for the second layer
+        self.b2 = nn.Parameter(1, 1)   # Bias for the second layer
+        
     def run(self, x):
         """
         Runs the model for a batch of examples.
@@ -84,6 +88,13 @@ class RegressionModel(object):
             A node with shape (batch_size x 1) containing predicted y-values
         """
         "*** YOUR CODE HERE ***"
+        # Forward pass through the network
+        x = nn.Linear(x, self.W1)
+        x = nn.AddBias(x, self.b1)
+        x = nn.ReLU(x)
+        x = nn.Linear(x, self.W2)
+        x = nn.AddBias(x, self.b2)
+        return x
 
     def get_loss(self, x, y):
         """
@@ -96,12 +107,42 @@ class RegressionModel(object):
         Returns: a loss node
         """
         "*** YOUR CODE HERE ***"
+        predictions = self.run(x)
+        loss = nn.SquareLoss(predictions, y)
+        return loss
 
     def train(self, dataset):
         """
         Trains the model.
         """
         "*** YOUR CODE HERE ***"
+        # Set hyperparameters
+        learning_rate = 0.01
+        num_epochs = 1000
+        batch_size = 1
+        total_examples = 0
+        for _ in dataset.iterate_once(batch_size):
+            total_examples += 1
+        
+        for epoch in range(num_epochs):
+            total_loss = 0.0
+            for x_batch, y_batch in dataset.iterate_once(batch_size):
+                # Forward pass
+                loss = self.get_loss(x_batch, y_batch)
+                total_loss += nn.as_scalar(loss)
+                # Backward pass
+                grads = nn.gradients(loss, [self.W1, self.b1, self.W2, self.b2])
+                # Update parameters
+                self.W1.update(grads[0], -learning_rate)
+                self.b1.update(grads[1], -learning_rate)
+                self.W2.update(grads[2], -learning_rate)
+                self.b2.update(grads[3], -learning_rate)
+            # Print average loss for the epoch
+            avg_loss = total_loss / total_examples
+            print("Epoch {}, Average Loss: {:.6f}".format(epoch+1, avg_loss))
+            # Check for early stopping
+            if avg_loss < 0.02:
+                break
 
 class DigitClassificationModel(object):
     """
