@@ -254,6 +254,20 @@ class LanguageIDModel(object):
         # Initialize your model parameters here
         "*** YOUR CODE HERE ***"
 
+        self.num_chars = 47
+        self.languages = ["English", "Spanish", "Finnish", "Dutch", "Polish"]
+
+        # Initialize your model parameters here
+        hidden_size = 250
+        
+        self.W_initial = nn.Parameter(self.num_chars, hidden_size)
+        self.b_initial = nn.Parameter(1, hidden_size) 
+        self.W_hidden = nn.Parameter(hidden_size, hidden_size)
+        self.b_hidden = nn.Parameter(1, hidden_size)
+
+        self.W_output = nn.Parameter(hidden_size, len(self.languages))
+        self.b_output = nn.Parameter(1, len(self.languages))
+        
     def run(self, xs):
         """
         Runs the model for a batch of examples.
@@ -284,6 +298,22 @@ class LanguageIDModel(object):
                 (also called logits)
         """
         "*** YOUR CODE HERE ***"
+    
+        # Initialize hidden state
+        h = nn.Linear(xs[0], self.W_initial)
+        h = nn.AddBias(h, self.b_initial)
+        h = nn.ReLU(h)
+
+        # Update hidden state for each character
+        for x in xs[1:]:
+            z = nn.Linear(x, self.W_initial)
+            z = nn.AddBias(z, self.b_initial)
+            h = nn.ReLU(nn.Add(nn.Linear(h, self.W_hidden), nn.Linear(z, self.W_hidden)))
+
+        # Output layer
+        output = nn.Linear(h, self.W_output)
+        output = nn.AddBias(output, self.b_output)
+        return output
 
     def get_loss(self, xs, y):
         """
@@ -300,9 +330,29 @@ class LanguageIDModel(object):
         Returns: a loss node
         """
         "*** YOUR CODE HERE ***"
+        scores = self.run(xs)
+        return nn.SoftmaxLoss(scores, y)
 
     def train(self, dataset):
         """
         Trains the model.
         """
         "*** YOUR CODE HERE ***"
+            
+        num_epochs = 20
+        batch_size = 32
+        learning_rate= 0.1
+
+        for epoch in range(num_epochs):
+            total_loss = 0.0
+            for x_batch, y_batch in dataset.iterate_once(batch_size):
+                # Forward pass
+                loss = self.get_loss(x_batch, y_batch)
+                total_loss += nn.as_scalar(loss)
+                # Backward pass
+                grads = nn.gradients(loss, [self.W_initial, self.b_initial, self.W_hidden, self.b_hidden, self.W_output, self.b_output])
+                # Update parameters
+                for param, grad in zip([self.W_initial, self.b_initial, self.W_hidden, self.b_hidden, self.W_output, self.b_output], grads):
+                    param.update(grad, -learning_rate)
+            print("Epoch {}, Avg. Loss: {:.4f}".format(epoch+1, total_loss))
+
