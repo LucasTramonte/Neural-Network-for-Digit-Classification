@@ -11,16 +11,34 @@ https://centralesupelec.edunao.com/pluginfile.php/423959/course/section/60097/p1
 
 ## Question 1
 
-![Decision boundary - Perceptron](Q1.png)
+Implementing a binary perceptron:
+
+![Decision boundary - Perceptron](assets\Q1.png)
 
 ## Question 2
 
-![Non-linear Regression](Q2.png)
+train a neural network to approximate sin(x) over  [−2π,2π]:
+
+![Non-linear Regression](assets\Q2.png)
 
 ## Question 3
 
-![Digit Classification](Q2.png)
+Result of training a network to classify handwritten digits:
+
+![Digit Classification](assets\Q3.png)
 
 ## Question 4
 
-![Language Identification](Q2.png)
+Now we're developing a compact neural network model to identify the language of individual words. Our dataset comprises words from five languages, as shown in the table below:
+
+| Word       | Language |
+|------------|----------|
+| discussed  | English  |
+| eternidad  | Spanish  |
+| itseänne   | Finnish  |
+| paleis     | Dutch    |
+| mieszkać   | Polish   |
+
+Solution:
+
+![Language Identification](assets\Q4.png)
