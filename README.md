@@ -13,19 +13,19 @@ https://centralesupelec.edunao.com/pluginfile.php/423959/course/section/60097/p1
 
 Implementing a binary perceptron:
 
-![Decision boundary - Perceptron](assets\Q1.png)
+![Decision boundary - Perceptron](assets/Q1.png)
 
 ## Question 2
 
 train a neural network to approximate sin(x) over  [−2π,2π]:
 
-![Non-linear Regression](assets\Q2.png)
+![Non-linear Regression](assets/Q2.png)
 
 ## Question 3
 
 Result of training a network to classify handwritten digits:
 
-![Digit Classification](assets\Q3.png)
+![Digit Classification](assets/Q3.png)
 
 ## Question 4
 
@@ -41,4 +41,4 @@ Now we're developing a compact neural network model to identify the language of 
 
 Solution:
 
-![Language Identification](assets\Q4.png)
+![Language Identification](assets/Q4.png)
