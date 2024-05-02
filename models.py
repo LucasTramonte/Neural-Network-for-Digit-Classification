@@ -27,8 +27,7 @@ class PerceptronModel(object):
         Returns: a node containing a single number (the score)
         """
         "*** YOUR CODE HERE ***"
-        dot_product = nn.DotProduct(x, self.w)
-        return dot_product
+        return nn.DotProduct(x, self.w)
 
     def get_prediction(self, x):
         """
@@ -39,10 +38,8 @@ class PerceptronModel(object):
         "*** YOUR CODE HERE ***"
         score_node = self.run(x)
         score = nn.as_scalar(score_node)
-        if score >= 0:
-            return 1
-        else:
-            return -1
+
+        return 1 if score >= 0 else -1
 
     def train(self, dataset):
         """
@@ -56,7 +53,7 @@ class PerceptronModel(object):
             for x, y in dataset.iterate_once(batch_size):
                 y_scalar = nn.as_scalar(y)
                 prediction = self.get_prediction(x)
-                if abs(prediction-y_scalar)>1e-5:  
+                if abs(prediction-y_scalar)>1e-6:  
                     misclassified = True
                     # Update weights
                     direction = x
@@ -108,8 +105,7 @@ class RegressionModel(object):
         """
         "*** YOUR CODE HERE ***"
         predictions = self.run(x)
-        loss = nn.SquareLoss(predictions, y)
-        return loss
+        return nn.SquareLoss(predictions, y)
 
     def train(self, dataset):
         """
@@ -120,9 +116,8 @@ class RegressionModel(object):
         learning_rate = 0.01
         num_epochs = 1000
         batch_size = 1
-        total_examples = 0
-        for _ in dataset.iterate_once(batch_size):
-            total_examples += 1
+        
+        total_examples = sum(1 for _ in dataset.iterate_once(batch_size))
         
         for epoch in range(num_epochs):
             total_loss = 0.0
@@ -140,7 +135,6 @@ class RegressionModel(object):
             # Print average loss for the epoch
             avg_loss = total_loss / total_examples
             print("Epoch {}, Average Loss: {:.6f}".format(epoch+1, avg_loss))
-            # Check for early stopping
             if avg_loss < 0.02:
                 break
 
@@ -254,10 +248,6 @@ class LanguageIDModel(object):
         # Initialize your model parameters here
         "*** YOUR CODE HERE ***"
 
-        self.num_chars = 47
-        self.languages = ["English", "Spanish", "Finnish", "Dutch", "Polish"]
-
-        # Initialize your model parameters here
         hidden_size = 250
         
         self.W_initial = nn.Parameter(self.num_chars, hidden_size)
